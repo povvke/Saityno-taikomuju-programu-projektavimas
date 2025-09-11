@@ -4,7 +4,7 @@
    1.1 [Sistemos paskirtis](#11-sistemos-paskirtis)  
    1.2 [Funkciniai reikalavimai](#12-funkciniai-reikalavimai)  
 
-2. [Sistemos architektūra](#2-sistemos-architektura)  
+2. [Sistemos architektūra](#sistemos-architektura)  
 
 ---
 
@@ -49,6 +49,7 @@ Administratorius galės:
 ---
 
 # 2. Sistemos architektūra
+<a id="sistemos-architektura"></a>
 
 Sistemos sudedamosios dalys:
 
