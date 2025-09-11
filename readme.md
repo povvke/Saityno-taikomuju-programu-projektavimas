@@ -1,13 +1,14 @@
-Turinys  
+# Turinys
 
+1. [Sprendžiamo uždavinio aprašymas](#1-sprendziamo-uzdavinio-aprasymas)  
+   1.1 [Sistemos paskirtis](#11-sistemos-paskirtis)  
+   1.2 [Funkciniai reikalavimai](#12-funkciniai-reikalavimai)  
 
-1. [Sprendžiamo uždavinio aprašymas](#sprendziamo-uzdavinio-aprasymas)  
-   1.1 [Sistemos paskirtis](#sistemos-paskirtis)  
-   1.2 [Funkciniai reikalavimai](#funkciniai-reikalavimai)  
+2. [Sistemos architektūra](#2-sistemos-architektura)  
 
-2. [Sistemos architektūra](#sistemos-architektura)  
+---
 
-# Sprendžiamo uždavinio aprašymas
+# 1. Sprendžiamo uždavinio aprašymas
 
 ## 1.1 Sistemos paskirtis
 
@@ -29,23 +30,25 @@ Neregistruotas sistemos naudotojas galės:
 Registruotas sistemos naudotojas galės:
 
 1. Atsijungti nuo internetinės aplikacijos;
-2. Sukurti receptą:
-    1. Užpildyti recepto instrukciją;
-    2. Užpildyti ingredientų sąrašą;
-    3. Užpildyti maistingumo informacijos lentelę;
-3. Peržiūrėti kitų naudotojų sukurtus receptus;
-4. Įvertinti kitų sukurtų naudotojų receptus;
-5. Redaguoti savo sukurtus receptus;
-6. Šalinti savo sukurtus receptus;
-7. Redaguoti savo sukurtus atsiliepimus;
-8. Šalinti savo sukurtus atsiliepimus.
+2. Sukurti receptą:  
+   1. Užpildyti recepto instrukciją;  
+   2. Užpildyti ingredientų sąrašą;  
+   3. Užpildyti maistingumo informacijos lentelę;  
+3. Peržiūrėti kitų naudotojų sukurtus receptus;  
+4. Įvertinti kitų sukurtų naudotojų receptus;  
+5. Redaguoti savo sukurtus receptus;  
+6. Šalinti savo sukurtus receptus;  
+7. Redaguoti savo sukurtus atsiliepimus;  
+8. Šalinti savo sukurtus atsiliepimus.  
 
 Administratorius galės:
 
 1. Šalinti sukurtus receptus;
 2. Šalinti sukurtus atsiliepimus.
 
-# 2\. Sistemos architektūra
+---
+
+# 2. Sistemos architektūra
 
 Sistemos sudedamosios dalys:
 
