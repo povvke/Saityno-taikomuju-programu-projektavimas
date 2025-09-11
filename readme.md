@@ -1,12 +1,11 @@
 Turinys  
 
-[1\. Sprendžiamo uždavinio aprašymas 3](#__RefHeading___Toc2050_2958260731)
 
-[1.1 Sistemos paskirtis 3](#__RefHeading___Toc2110_2958260731)
+1. [Sprendžiamo uždavinio aprašymas](#sprendziamo-uzdavinio-aprasymas)  
+   1.1 [Sistemos paskirtis](#sistemos-paskirtis)  
+   1.2 [Funkciniai reikalavimai](#funkciniai-reikalavimai)  
 
-[1.2 Funkciniai reikalavimai 3](#__RefHeading___Toc145_3529459674)
-
-[2\. Sistemos architektūra 4](#__RefHeading___Toc147_3529459674)
+2. [Sistemos architektūra](#sistemos-architektura)  
 
 # Sprendžiamo uždavinio aprašymas
 
