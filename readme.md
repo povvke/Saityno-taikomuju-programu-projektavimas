@@ -12,7 +12,7 @@
 
 ## 1.1 Sistemos paskirtis
 
-Sistemos tikslas – suteikti galimybę vartotojams dalintis receptais, kaupti jų aprašymus, bei diskutuoti apie patiekalus. Sistema leis struktūruotai saugoti receptus, jų ingredientus ir vartotojų atsiliepimus.
+Sistemos tikslas – suteikti galimybę vartotojams dalintis receptais, kaupti jų aprašymus, bei diskutuoti apie patiekalus. Sistema leis struktūruotai saugoti receptus, jų ingredientus, kategorijas ir vartotojų atsiliepimus.
 
 Veikimo principas – pačią kuriamą platformą sudaro dvi dalys: internetinė aplikacija, kuria naudosis svečiai, nariai, administratorius bei aplikacijų programavimo sąsaja (angl. trump. API).
 
@@ -25,7 +25,8 @@ Neregistruotas sistemos naudotojas galės:
 1. Prisijungti prie internetinės aplikacijos;
 2. Prisiregistruoti prie internetinės aplikacijos;
 3. Palikti anoniminius atsiliepimus;
-4. Peržiūrėti kitų naudotojų sukurtus receptus.
+4. Peržiūrėti kitų naudotojų sukurtus receptus;
+5. Naršyti receptų kategorijas.
 
 Registruotas sistemos naudotojas galės:
 
@@ -34,17 +35,22 @@ Registruotas sistemos naudotojas galės:
    1. Užpildyti recepto instrukciją;  
    2. Užpildyti ingredientų sąrašą;  
    3. Užpildyti maistingumo informacijos lentelę;  
+   4. Užpildyti recepto kategoriją;
 3. Peržiūrėti kitų naudotojų sukurtus receptus;  
 4. Įvertinti kitų sukurtų naudotojų receptus;  
 5. Redaguoti savo sukurtus receptus;  
 6. Šalinti savo sukurtus receptus;  
 7. Redaguoti savo sukurtus atsiliepimus;  
-8. Šalinti savo sukurtus atsiliepimus.  
+8. Šalinti savo sukurtus atsiliepimus;  
+9. Naršyti receptų kategorijas.
+
 
 Administratorius galės:
 
 1. Šalinti sukurtus receptus;
-2. Šalinti sukurtus atsiliepimus.
+2. Šalinti sukurtus atsiliepimus;
+3. Kurti/šalinti/redaguoti receptų kategorijas.
+
 
 ---
 
