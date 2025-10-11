@@ -8,4 +8,5 @@ devenv.local.nix
 # pre-commit
 .pre-commit-config.yaml
 
-server/__pycache__
+server/__pycache__/*
+server/*/__pycache__/*
