@@ -13,8 +13,10 @@
     typescript-language-server
     svelte-language-server
     basedpyright
+    sqls
     bun
 
+    python313Packages.sqlmodel
     python313Packages.fastapi
     python313Packages.fastapi-cli
     python313Packages.black
@@ -26,7 +28,7 @@
 
   processes = {
     server = {
-      exec = "fastapi dev";
+      exec = "fastapi dev main.py";
       cwd = "./server";
     };
 
