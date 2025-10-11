@@ -10,3 +10,4 @@ devenv.local.nix
 
 server/__pycache__/*
 server/*/__pycache__/*
+server/*.db

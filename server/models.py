@@ -36,11 +36,11 @@ class RecipeBase(SQLModel):
     calories: int
     prep_time: int
     servings: int
-    category_id: int = Field(foreign_key="category.id")
+    category_id: int | None = Field(default=None, foreign_key="category.id")
 
 
 class Recipe(RecipeBase, table=True):
-    id: int = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
     slug: str = Field(unique=True)
 
 
@@ -64,11 +64,11 @@ class CommentBase(SQLModel):
     text: str
     rating: Decimal = Field(default=0, max_digits=2, decimal_places=1)
     user_id: int = Field(foreign_key="user.id")  # TODO: GET THIS FROM AUTH TOKEN
-    recipe_id: int = Field(foreign_key="recipe.id")
+    recipe_id: int | None = Field(default=None, foreign_key="recipe.id")
 
 
 class Comment(CommentBase, table=True):
-    id: int = Field(primary_key=True)
+    id: int | None = Field(default=None, primary_key=True)
 
 
 class CommentUpdate(BaseModel):
