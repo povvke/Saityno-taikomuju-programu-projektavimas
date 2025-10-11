@@ -6,7 +6,7 @@ from sqlmodel import select
 
 from ..models import (
     Category,
-    CategoryCreate,
+    CategoryBase,
     CategoryPublic,
     CategoryUpdate,
     Message,
@@ -26,7 +26,7 @@ router = APIRouter()
         409: {"model": Message, "description": "Conflict Error"},
     },
 )
-async def create_category(cat: CategoryCreate, session: SessionDep):
+async def create_category(cat: CategoryBase, session: SessionDep):
     try:
         slug = slugify(cat.name)
         cat_db = Category(

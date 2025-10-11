@@ -22,10 +22,6 @@ class CategoryPublic(CategoryBase):
     id: int
 
 
-class CategoryCreate(CategoryBase):
-    pass
-
-
 class CategoryUpdate(BaseModel):
     name: str | None = None
     description: str | None = None
@@ -34,7 +30,6 @@ class CategoryUpdate(BaseModel):
 
 class RecipeBase(SQLModel):
     name: str
-    slug: str = Field(unique=True)
     description: str | None
     instructions: str
     ingredients: str  # json format
@@ -45,17 +40,22 @@ class RecipeBase(SQLModel):
 
 class Recipe(RecipeBase, table=True):
     id: int = Field(primary_key=True)
+    slug: str = Field(unique=True)
 
 
-class RecipeUpdate:
+class RecipeUpdate(BaseModel):
     name: str | None = None
-    slug: str | None = None
     description: str | None = None
     instructions: str | None = None
     ingredients: str | None = None
     calories: int | None = None
     prep_time: int | None = None
     servings: int | None = None
+
+
+class RecipePublic(RecipeBase):
+    slug: str
+    id: int
 
 
 class CommentBase(SQLModel):
@@ -69,11 +69,15 @@ class Comment(CommentBase, table=True):
     id: int = Field(primary_key=True)
 
 
-class CommentUpdate:
+class CommentUpdate(BaseModel):
     title: str | None = None
     text: str | None = None
     rating: Decimal | None = None
     user_id: int | None = None
+
+
+class CommentPublic(CommentBase):
+    id: int
 
 
 class User(SQLModel, table=True):
