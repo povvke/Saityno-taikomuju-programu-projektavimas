@@ -22,7 +22,10 @@
     python313Packages.black
   ];
 
-  languages.python.enable = true;
+  languages.python = {
+    enable = true;
+    directory = "./server";
+  };
   languages.javascript.enable = true;
   languages.typescript.enable = true;
 
