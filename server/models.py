@@ -37,6 +37,7 @@ class RecipeBase(SQLModel):
     prep_time: int
     servings: int
     category_id: int | None = Field(default=None, foreign_key="category.id")
+    author_id: int | None = Field(default=None, foreign_key="user.id")
 
 
 class Recipe(RecipeBase, table=True):
@@ -87,7 +88,7 @@ class CommentPublic(CommentBase):
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True)
     username: str
-    hashed_password: str
+    password: str
     role: str
 
 
