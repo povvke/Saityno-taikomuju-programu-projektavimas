@@ -74,7 +74,9 @@ class Comment(CommentBase, table=True):
 class CommentUpdate(BaseModel):
     title: str | None = None
     text: str | None = None
-    rating: Decimal | None = None
+    rating: Decimal | None = Field(  # pyright: ignore[reportAny]
+        default=None, max_digits=2, decimal_places=1
+    )
 
 
 class CommentPublic(CommentBase):

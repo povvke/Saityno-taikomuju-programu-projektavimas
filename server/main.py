@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from .models import create_db_and_tables
 from .routes.categories import router as categories_router
 from .routes.recipes import router as recipes_router
+from .routes.comments import router as comments_router
 
 
 @asynccontextmanager
@@ -17,3 +18,4 @@ app = FastAPI(lifespan=lifespan)
 
 app.include_router(categories_router, prefix="/categories", tags=["categories"])
 app.include_router(recipes_router, prefix="/recipes", tags=["recipes"])
+app.include_router(comments_router, prefix="/comments", tags=["comments"])
