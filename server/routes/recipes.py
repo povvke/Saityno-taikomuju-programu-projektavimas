@@ -4,7 +4,17 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
 
-from ..models import Message, Recipe, RecipeBase, RecipePublic, RecipeUpdate, SessionDep
+from ..models import (
+    Category,
+    Comment,
+    CommentPublic,
+    Message,
+    Recipe,
+    RecipeBase,
+    RecipePublic,
+    RecipeUpdate,
+    SessionDep,
+)
 
 from ..utils import slugify
 
@@ -18,10 +28,17 @@ router = APIRouter()
     response_model=RecipePublic,
     responses={
         409: {"model": Message, "description": "Conflict Error"},
+        404: {"model": Message, "description": "Not Found Error"},
     },
 )
 async def create_recipe(recipe: RecipeBase, session: SessionDep):
     try:
+        category = session.get(Category, recipe.category_id)
+        if not category:
+            return JSONResponse(
+                status_code=404, content={"message": "Category not found"}
+            )
+
         slug = slugify(recipe.name)
         recipe_db = Recipe(
             name=recipe.name,
@@ -85,6 +102,12 @@ async def update_recipe(id: int, recipe: RecipeUpdate, session: SessionDep):
                 status_code=404, content={"message": "Recipe not found"}
             )
 
+        category = session.get(Category, recipe.category_id)
+        if not category:
+            return JSONResponse(
+                status_code=404, content={"message": "Category not found"}
+            )
+
         recipe_data = recipe.model_dump(exclude_unset=True)
         if recipe.name:
             recipe_data["slug"] = slugify(recipe.name)
@@ -121,3 +144,19 @@ async def delete_recipe(
     session.delete(recipe)
     session.commit()
     return {"ok": True}
+
+
+@router.get("/{id}/comments", response_model=list[CommentPublic])
+async def read_comments(
+    recipe_id: int,
+    session: SessionDep,
+    offset: int = 0,
+    limit: Annotated[int, Query(le=100)] = 100,
+):
+    comments = session.exec(
+        select(Comment)
+        .where(Comment.recipe_id == recipe_id)
+        .offset(offset)
+        .limit(limit)
+    ).all()
+    return comments

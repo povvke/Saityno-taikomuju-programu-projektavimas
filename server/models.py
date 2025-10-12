@@ -52,6 +52,7 @@ class RecipeUpdate(BaseModel):
     calories: int | None = None
     prep_time: int | None = None
     servings: int | None = None
+    category_id: int | None = None
 
 
 class RecipePublic(RecipeBase):
