@@ -128,15 +128,12 @@ async def delete_category(
 
 @router.get("/{id}/recipes", response_model=list[RecipePublic])
 async def read_recipes(
-    category_id: int,
+    id: int,
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ):
     recipes = session.exec(
-        select(Recipe)
-        .where(Recipe.category_id == category_id)
-        .offset(offset)
-        .limit(limit)
+        select(Recipe).where(Recipe.category_id == id).offset(offset).limit(limit)
     ).all()
     return recipes

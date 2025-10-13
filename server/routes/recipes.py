@@ -148,15 +148,12 @@ async def delete_recipe(
 
 @router.get("/{id}/comments", response_model=list[CommentPublic])
 async def read_comments(
-    recipe_id: int,
+    id: int,
     session: SessionDep,
     offset: int = 0,
     limit: Annotated[int, Query(le=100)] = 100,
 ):
     comments = session.exec(
-        select(Comment)
-        .where(Comment.recipe_id == recipe_id)
-        .offset(offset)
-        .limit(limit)
+        select(Comment).where(Comment.recipe_id == id).offset(offset).limit(limit)
     ).all()
     return comments
