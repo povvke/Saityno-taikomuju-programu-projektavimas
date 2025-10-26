@@ -20,6 +20,10 @@
     python313Packages.fastapi
     python313Packages.fastapi-cli
     python313Packages.black
+    python313Packages.httpx
+    python313Packages.pytest
+    python313Packages.pytest-cov
+    python313Packages.pytest-asyncio
   ];
 
   languages.python = {
