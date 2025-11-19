@@ -87,8 +87,8 @@ class CommentPublic(CommentBase):
 
 class User(SQLModel, table=True):
     id: int = Field(primary_key=True)
+    email: str | None = None
     username: str
-    password: str
     role: str
 
 

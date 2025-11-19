@@ -1,0 +1,8 @@
+sqlmodel
+fastapi
+fastapi-cli
+black
+httpx
+pytest
+pytest-cov
+pytest-asyncio
