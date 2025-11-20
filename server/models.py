@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Annotated
 from decimal import Decimal
 
@@ -115,6 +116,15 @@ engine = create_engine(sqlite_url, connect_args=connect_args)
 
 def create_db_and_tables():
     SQLModel.metadata.create_all(engine)
+
+    seed_sql = Path("seed.sql").read_text()
+
+    conn = engine.raw_connection()
+    try:
+        conn.executescript(seed_sql)
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def get_session():
