@@ -34,8 +34,9 @@ async def create_comment(
     comment: CommentBase,
     session: SessionDep,
     res: Response,
-    user: User = Depends(get_current_user),
+    current: tuple[User, str] = Depends(get_current_user),
 ):
+    user, _ = current
     recipe = session.get(Recipe, comment.recipe_id)
     if not recipe:
         return JSONResponse(
@@ -102,8 +103,9 @@ async def update_comment(
     comment: CommentUpdate,
     session: SessionDep,
     res: Response,
-    user: User = Depends(get_current_user),
+    current: tuple[User, str] = Depends(get_current_user),
 ):
+    user, _ = current
     comment_db = session.get(Comment, id)
     if not comment_db:
         return JSONResponse(
@@ -143,8 +145,13 @@ async def update_comment(
     },
 )
 async def delete_comment(
-    id: int, session: SessionDep, res: Response, user: User = Depends(get_current_user)
+    id: int,
+    session: SessionDep,
+    res: Response,
+    current: tuple[User, str] = Depends(get_current_user),
 ):
+
+    user, role = current
     comment = session.get(Comment, id)
     if not comment:
         return JSONResponse(
@@ -153,7 +160,7 @@ async def delete_comment(
             headers=res.headers,
         )
 
-    if comment.user_id is not user.id and user.role is not "ADMIN":
+    if comment.user_id is not user.id and role != "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have rights to this resource"},

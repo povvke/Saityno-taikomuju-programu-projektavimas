@@ -39,8 +39,9 @@ async def create_recipe(
     recipe: RecipeBase,
     session: SessionDep,
     response: Response,
-    user: User = Depends(get_current_user),
+    curr: tuple[User, str] = Depends(get_current_user),
 ):
+    user, _ = curr
     try:
         category = session.get(Category, recipe.category_id)
         if not category:
@@ -113,8 +114,9 @@ async def update_recipe(
     recipe: RecipeUpdate,
     session: SessionDep,
     response: Response,
-    user: User = Depends(get_current_user),
+    curr: tuple[User, str] = Depends(get_current_user),
 ):
+    user, _ = curr
     try:
         recipe_db = session.get(Recipe, id)
         if not recipe_db:
@@ -170,8 +172,9 @@ async def delete_recipe(
     id: int,
     session: SessionDep,
     response: Response,
-    user: User = Depends(get_current_user),
+    curr: tuple[User, str] = Depends(get_current_user),
 ):
+    user, role = curr
     recipe = session.get(Recipe, id)
     if not recipe:
         return JSONResponse(
@@ -180,7 +183,7 @@ async def delete_recipe(
             headers=response.headers,
         )
 
-    if recipe.author_id is not user.id and user.role is not "ADMIN":
+    if recipe.author_id is not user.id and role != "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have rights to this resource"},

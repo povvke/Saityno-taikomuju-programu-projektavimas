@@ -30,8 +30,8 @@ def create_refresh_token(length: int = 128) -> str:
     return secrets.token_urlsafe(length)
 
 
-def sign_jwt(user_id: int) -> tuple[str, str]:
-    payload = {"sub": str(user_id), "expires": time.time() + 600}
+def sign_jwt(user_id: int, role: str) -> tuple[str, str]:
+    payload = {"sub": str(user_id), "role": role, "expires": time.time() + 600}
     token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
     refresh = create_refresh_token()
 
@@ -81,7 +81,7 @@ async def create_user(user: UserBase, session: SessionDep, response: Response):
     session.add(user_in_db)
     session.commit()
     session.refresh(user_in_db)
-    token, refresh = sign_jwt(user_in_db.id)
+    token, refresh = sign_jwt(user_in_db.id, user_in_db.role)
     user_in_db.refresh_token = refresh
     session.commit()
     session.refresh(user_in_db)
@@ -107,7 +107,7 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
     if bcrypt.checkpw(
         bytes(user.password, "UTF-8"), bytes(existing_user.password, "UTF-8")
     ):
-        token, refresh = sign_jwt(existing_user.id)
+        token, refresh = sign_jwt(existing_user.id, existing_user.role)
         response.set_cookie(key="access_token", value=token)
         response.set_cookie(key="refresh_token", value=refresh)
         existing_user.refresh_token = refresh
@@ -126,7 +126,7 @@ async def get_current_user(
     response: Response,
     api_key: str = Depends(access_token_cookie),
     refresh_token: str = Depends(refresh_token_cookie),
-) -> User | JSONResponse:
+) -> tuple[User, str] | JSONResponse:
     access = api_key
     if not access:
         raise HTTPException(
@@ -136,6 +136,7 @@ async def get_current_user(
 
     payload = decode_jwt(access)
     user_id = payload["sub"]
+    role = payload["role"]
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
@@ -146,7 +147,7 @@ async def get_current_user(
     # use refresh token & rotate
     if payload["expires"] < time.time():
         if user.refresh_token == refresh_token:
-            token, refresh = sign_jwt(user.id)
+            token, refresh = sign_jwt(user.id, user.role)
             response.set_cookie(key="access_token", value=token)
             response.set_cookie(key="refresh_token", value=refresh)
             user.refresh_token = refresh
@@ -159,4 +160,4 @@ async def get_current_user(
             )
 
     # Fetch from DB
-    return user
+    return user, role

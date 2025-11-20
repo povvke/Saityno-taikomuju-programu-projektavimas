@@ -116,7 +116,8 @@ INSERT INTO recipe (name, description, instructions, ingredients, calories, prep
 INSERT INTO "user" (id, email, username, password, role) VALUES
 (1, "john@gmail.com", 'john_doe', 'hashed_password', 'USER'),
 (2, "jane@gmail.com", 'jane_smith', 'hashed_password', 'USER'),
-(3, "chef_mike@gmail.com", 'chef_mike', 'hashed_password', 'ADMIN');
+(3, "chef_mike@gmail.com", 'chef_mike', 'hashed_password', 'ADMIN'),
+(4, "admin@admin.com", 'admin', '$2b$12$LKrBcPdYJ0kGqPj.hOw3vumrh89vs9Az7r6b0KVE08bt.cdOOQrCe', 'ADMIN');
 
 INSERT INTO comment (title, text, rating, user_id, recipe_id) VALUES
 ('Delicious!', 'These eggs are the perfect breakfast', 5.0, 1, 1),

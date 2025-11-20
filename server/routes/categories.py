@@ -36,9 +36,10 @@ async def create_category(
     cat: CategoryBase,
     session: SessionDep,
     response: Response,
-    user: User = Depends(get_current_user),
+    current: tuple[User, str] = Depends(get_current_user),
 ):
-    if user.role is not "ADMIN":
+    _, role = current
+    if role != "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
@@ -103,9 +104,10 @@ async def update_category(
     cat: CategoryUpdate,
     session: SessionDep,
     res: Response,
-    user: User = Depends(get_current_user),
+    curr: tuple[User, str] = Depends(get_current_user),
 ):
-    if user.role is not "ADMIN":
+    _, role = curr
+    if role != "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
@@ -149,9 +151,13 @@ async def update_category(
     },
 )
 async def delete_category(
-    id: int, session: SessionDep, res: Response, user: User = Depends(get_current_user)
+    id: int,
+    session: SessionDep,
+    res: Response,
+    curr: tuple[User, str] = Depends(get_current_user),
 ):
-    if user.role is not "ADMIN":
+    _, role = curr
+    if role != "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
