@@ -1,8 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
+
+from .auth import get_current_user
 
 from ..models import (
     Category,
@@ -14,6 +16,7 @@ from ..models import (
     RecipePublic,
     RecipeUpdate,
     SessionDep,
+    User,
 )
 
 from ..utils import slugify
@@ -29,9 +32,12 @@ router = APIRouter()
     responses={
         409: {"model": Message, "description": "Conflict Error"},
         404: {"model": Message, "description": "Not Found Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
-async def create_recipe(recipe: RecipeBase, session: SessionDep):
+async def create_recipe(
+    recipe: RecipeBase, session: SessionDep, user: User = Depends(get_current_user)
+):
     try:
         category = session.get(Category, recipe.category_id)
         if not category:
@@ -50,6 +56,7 @@ async def create_recipe(recipe: RecipeBase, session: SessionDep):
             prep_time=recipe.prep_time,
             servings=recipe.servings,
             category_id=recipe.category_id,
+            author_id=user.id,
         )
         session.add(recipe_db)
         session.commit()
@@ -92,14 +99,26 @@ async def read_recipes(
     responses={
         404: {"model": Message, "description": "Not Found Error"},
         409: {"model": Message, "description": "Conflict Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
-async def update_recipe(id: int, recipe: RecipeUpdate, session: SessionDep):
+async def update_recipe(
+    id: int,
+    recipe: RecipeUpdate,
+    session: SessionDep,
+    user: User = Depends(get_current_user),
+):
     try:
         recipe_db = session.get(Recipe, id)
         if not recipe_db:
             return JSONResponse(
                 status_code=404, content={"message": "Recipe not found"}
+            )
+
+        if recipe_db.author_id is not user.id:
+            return JSONResponse(
+                status_code=403,
+                content={"message": "You do not have rights to this resource"},
             )
 
         category = session.get(Category, recipe.category_id)
@@ -131,15 +150,21 @@ async def update_recipe(id: int, recipe: RecipeUpdate, session: SessionDep):
     "/{id}",
     responses={
         404: {"model": Message, "description": "Not Found Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
 async def delete_recipe(
-    id: int,
-    session: SessionDep,
+    id: int, session: SessionDep, user: User = Depends(get_current_user)
 ):
     recipe = session.get(Recipe, id)
     if not recipe:
         return JSONResponse(status_code=404, content={"message": "Recipe not found"})
+
+    if recipe.author_id is not user.id and user.role is not "ADMIN":
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have rights to this resource"},
+        )
 
     session.delete(recipe)
     session.commit()

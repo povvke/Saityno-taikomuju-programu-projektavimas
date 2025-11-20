@@ -1,7 +1,9 @@
 from typing import Annotated
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlmodel import select
+
+from .auth import get_current_user
 
 from ..models import (
     Comment,
@@ -11,6 +13,7 @@ from ..models import (
     Message,
     Recipe,
     SessionDep,
+    User,
 )
 
 
@@ -23,10 +26,13 @@ router = APIRouter()
     response_model=CommentPublic,
     responses={
         404: {"model": Message, "description": "Not Found Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
         400: {"model": Message, "description": "Bad Request Error"},
     },
 )
-async def create_comment(comment: CommentBase, session: SessionDep):
+async def create_comment(
+    comment: CommentBase, session: SessionDep, user: User = Depends(get_current_user)
+):
     recipe = session.get(Recipe, comment.recipe_id)
     if not recipe:
         return JSONResponse(status_code=404, content={"message": "Recipe not found"})
@@ -35,6 +41,8 @@ async def create_comment(comment: CommentBase, session: SessionDep):
         return JSONResponse(
             status_code=400, content={"message": "Rating must be between 0.0 and 5.0"}
         )
+
+    comment.user_id = user.id
 
     db_comment = Comment.model_validate(comment)
     session.add(db_comment)
@@ -71,12 +79,24 @@ async def read_comments(
     responses={
         404: {"model": Message, "description": "Not Found Error"},
         400: {"model": Message, "description": "Bad Request Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
-async def update_comment(id: int, comment: CommentUpdate, session: SessionDep):
+async def update_comment(
+    id: int,
+    comment: CommentUpdate,
+    session: SessionDep,
+    user: User = Depends(get_current_user),
+):
     comment_db = session.get(Comment, id)
     if not comment_db:
         return JSONResponse(status_code=404, content={"message": "Comment not found"})
+
+    if comment_db.user_id is not user.id:
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have rights to this resource"},
+        )
 
     if comment.rating:
         if comment.rating < 0.0 or comment.rating > 5.0:
@@ -97,15 +117,21 @@ async def update_comment(id: int, comment: CommentUpdate, session: SessionDep):
     "/{id}",
     responses={
         404: {"model": Message, "description": "Not Found Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
 async def delete_comment(
-    id: int,
-    session: SessionDep,
+    id: int, session: SessionDep, user: User = Depends(get_current_user)
 ):
     comment = session.get(Comment, id)
     if not comment:
         return JSONResponse(status_code=404, content={"message": "Comment not found"})
+
+    if comment.user_id is not user.id and user.role is not "ADMIN":
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have rights to this resource"},
+        )
 
     session.delete(comment)
     session.commit()

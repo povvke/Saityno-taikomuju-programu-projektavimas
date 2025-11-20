@@ -65,11 +65,11 @@ class CommentBase(SQLModel):
     title: str
     text: str
     rating: Decimal = Field(default=0, max_digits=2, decimal_places=1)
-    user_id: int = Field(foreign_key="user.id")  # TODO: GET THIS FROM AUTH TOKEN
     recipe_id: int | None = Field(default=None, foreign_key="recipe.id")
 
 
 class Comment(CommentBase, table=True):
+    user_id: int = Field(foreign_key="user.id")
     id: int | None = Field(default=None, primary_key=True)
 
 

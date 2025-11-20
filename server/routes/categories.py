@@ -1,8 +1,10 @@
 from typing import Annotated
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
+
+from .auth import get_current_user
 
 from ..models import (
     Category,
@@ -13,6 +15,7 @@ from ..models import (
     Recipe,
     RecipePublic,
     SessionDep,
+    User,
 )
 from ..utils import slugify
 
@@ -26,9 +29,18 @@ router = APIRouter()
     response_model=CategoryPublic,
     responses={
         409: {"model": Message, "description": "Conflict Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
-async def create_category(cat: CategoryBase, session: SessionDep):
+async def create_category(
+    cat: CategoryBase, session: SessionDep, user: User = Depends(get_current_user)
+):
+    if user.role is not "ADMIN":
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have access to this resource"},
+        )
+
     try:
         slug = slugify(cat.name)
         cat_db = Category(
@@ -78,9 +90,21 @@ async def read_categories(
     responses={
         404: {"model": Message, "description": "Not Found Error"},
         409: {"model": Message, "description": "Conflict Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
-async def update_category(id: int, cat: CategoryUpdate, session: SessionDep):
+async def update_category(
+    id: int,
+    cat: CategoryUpdate,
+    session: SessionDep,
+    user: User = Depends(get_current_user),
+):
+    if user.role is not "ADMIN":
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have access to this resource"},
+        )
+
     try:
         cat_db = session.get(Category, id)
         if not cat_db:
@@ -111,12 +135,18 @@ async def update_category(id: int, cat: CategoryUpdate, session: SessionDep):
     "/{id}",
     responses={
         404: {"model": Message, "description": "Not Found Error"},
+        403: {"model": Message, "description": "Forbidden Error"},
     },
 )
 async def delete_category(
-    id: int,
-    session: SessionDep,
+    id: int, session: SessionDep, user: User = Depends(get_current_user)
 ):
+    if user.role is not "ADMIN":
+        return JSONResponse(
+            status_code=403,
+            content={"message": "You do not have access to this resource"},
+        )
+
     cat = session.get(Category, id)
     if not cat:
         return JSONResponse(status_code=404, content={"message": "Category not found"})
