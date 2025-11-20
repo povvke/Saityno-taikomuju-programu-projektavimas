@@ -23,12 +23,13 @@
     python313Packages.httpx
     python313Packages.pytest
     python313Packages.pip
+    python313Packages.bcrypt
     python313Packages.pytest-cov
     python313Packages.pytest-asyncio
+    python313Packages.pyjwt
   ];
 
   languages.python = {
-    venv.enable = true;
     enable = true;
     directory = "./server";
   };

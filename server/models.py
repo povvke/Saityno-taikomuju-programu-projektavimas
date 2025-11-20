@@ -2,7 +2,7 @@ from typing import Annotated
 from decimal import Decimal
 
 from fastapi import Depends
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlmodel import Field, Session, SQLModel, create_engine
 
 
@@ -85,10 +85,19 @@ class CommentPublic(CommentBase):
     id: int
 
 
-class User(SQLModel, table=True):
-    id: int = Field(primary_key=True)
+class UserLoginSchema(BaseModel):
+    email: str
+    password: str
+
+
+class UserBase(SQLModel):
     email: str | None = None
     username: str
+    password: str
+
+
+class User(UserBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
     role: str
 
 
