@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
@@ -36,13 +36,18 @@ router = APIRouter()
     },
 )
 async def create_recipe(
-    recipe: RecipeBase, session: SessionDep, user: User = Depends(get_current_user)
+    recipe: RecipeBase,
+    session: SessionDep,
+    response: Response,
+    user: User = Depends(get_current_user),
 ):
     try:
         category = session.get(Category, recipe.category_id)
         if not category:
             return JSONResponse(
-                status_code=404, content={"message": "Category not found"}
+                status_code=404,
+                content={"message": "Category not found"},
+                headers=response.headers,
             )
 
         slug = slugify(recipe.name)
@@ -68,6 +73,7 @@ async def create_recipe(
             return JSONResponse(
                 status_code=409,
                 content={"message": "Recipe with this slug already exists"},
+                headers=response.headers,
             )
 
 
@@ -106,25 +112,31 @@ async def update_recipe(
     id: int,
     recipe: RecipeUpdate,
     session: SessionDep,
+    response: Response,
     user: User = Depends(get_current_user),
 ):
     try:
         recipe_db = session.get(Recipe, id)
         if not recipe_db:
             return JSONResponse(
-                status_code=404, content={"message": "Recipe not found"}
+                status_code=404,
+                content={"message": "Recipe not found"},
+                headers=response.headers,
             )
 
         if recipe_db.author_id is not user.id:
             return JSONResponse(
                 status_code=403,
                 content={"message": "You do not have rights to this resource"},
+                headers=response.headers,
             )
 
         category = session.get(Category, recipe.category_id)
         if not category:
             return JSONResponse(
-                status_code=404, content={"message": "Category not found"}
+                status_code=404,
+                content={"message": "Category not found"},
+                headers=response.headers,
             )
 
         recipe_data = recipe.model_dump(exclude_unset=True)
@@ -143,6 +155,7 @@ async def update_recipe(
             return JSONResponse(
                 status_code=409,
                 content={"message": "Recipe with this slug already exists"},
+                headers=response.headers,
             )
 
 
@@ -154,16 +167,24 @@ async def update_recipe(
     },
 )
 async def delete_recipe(
-    id: int, session: SessionDep, user: User = Depends(get_current_user)
+    id: int,
+    session: SessionDep,
+    response: Response,
+    user: User = Depends(get_current_user),
 ):
     recipe = session.get(Recipe, id)
     if not recipe:
-        return JSONResponse(status_code=404, content={"message": "Recipe not found"})
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Recipe not found"},
+            headers=response.headers,
+        )
 
     if recipe.author_id is not user.id and user.role is not "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have rights to this resource"},
+            headers=response.headers,
         )
 
     session.delete(recipe)

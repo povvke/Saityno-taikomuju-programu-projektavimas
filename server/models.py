@@ -37,11 +37,11 @@ class RecipeBase(SQLModel):
     prep_time: int
     servings: int
     category_id: int | None = Field(default=None, foreign_key="category.id")
-    author_id: int | None = Field(default=None, foreign_key="user.id")
 
 
 class Recipe(RecipeBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    author_id: int | None = Field(default=None, foreign_key="user.id")
     slug: str = Field(unique=True)
 
 
@@ -98,6 +98,7 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    refresh_token: str | None = Field(default=None)
     role: str
 
 

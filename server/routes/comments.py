@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 from sqlmodel import select
 
@@ -31,20 +31,35 @@ router = APIRouter()
     },
 )
 async def create_comment(
-    comment: CommentBase, session: SessionDep, user: User = Depends(get_current_user)
+    comment: CommentBase,
+    session: SessionDep,
+    res: Response,
+    user: User = Depends(get_current_user),
 ):
     recipe = session.get(Recipe, comment.recipe_id)
     if not recipe:
-        return JSONResponse(status_code=404, content={"message": "Recipe not found"})
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Recipe not found"},
+            headers=res.headers,
+        )
 
     if comment.rating < 0.0 or comment.rating > 5.0:
         return JSONResponse(
-            status_code=400, content={"message": "Rating must be between 0.0 and 5.0"}
+            status_code=400,
+            content={"message": "Rating must be between 0.0 and 5.0"},
+            headers=res.headers,
         )
 
-    comment.user_id = user.id
+    new_comment = Comment(
+        user_id=user.id,
+        title=comment.title,
+        text=comment.text,
+        rating=comment.rating,
+        recipe_id=comment.recipe_id,
+    )
 
-    db_comment = Comment.model_validate(comment)
+    db_comment = Comment.model_validate(new_comment)
     session.add(db_comment)
     session.commit()
     session.refresh(db_comment)
@@ -86,16 +101,22 @@ async def update_comment(
     id: int,
     comment: CommentUpdate,
     session: SessionDep,
+    res: Response,
     user: User = Depends(get_current_user),
 ):
     comment_db = session.get(Comment, id)
     if not comment_db:
-        return JSONResponse(status_code=404, content={"message": "Comment not found"})
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Comment not found"},
+            headers=res.headers,
+        )
 
     if comment_db.user_id is not user.id:
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have rights to this resource"},
+            headers=res.headers,
         )
 
     if comment.rating:
@@ -103,6 +124,7 @@ async def update_comment(
             return JSONResponse(
                 status_code=400,
                 content={"message": "Rating must be between 0.0 and 5.0"},
+                headers=res.headers,
             )
 
     comment_data = comment.model_dump(exclude_unset=True)
@@ -121,16 +143,21 @@ async def update_comment(
     },
 )
 async def delete_comment(
-    id: int, session: SessionDep, user: User = Depends(get_current_user)
+    id: int, session: SessionDep, res: Response, user: User = Depends(get_current_user)
 ):
     comment = session.get(Comment, id)
     if not comment:
-        return JSONResponse(status_code=404, content={"message": "Comment not found"})
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Comment not found"},
+            headers=res.headers,
+        )
 
     if comment.user_id is not user.id and user.role is not "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have rights to this resource"},
+            headers=res.headers,
         )
 
     session.delete(comment)

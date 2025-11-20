@@ -6,6 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyCookie
 import jwt
+import secrets
 
 import bcrypt
 from sqlmodel import select
@@ -18,22 +19,27 @@ import re
 email_regex = re.compile(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
 access_token_cookie = APIKeyCookie(name="access_token", auto_error=True)
+refresh_token_cookie = APIKeyCookie(name="refresh_token", auto_error=True)
 
 
 def is_valid_email(email: str):
     return bool(email_regex.match(email))
 
 
-def sign_jwt(user_id: int) -> str:
+def create_refresh_token(length: int = 128) -> str:
+    return secrets.token_urlsafe(length)
+
+
+def sign_jwt(user_id: int) -> tuple[str, str]:
     payload = {"sub": str(user_id), "expires": time.time() + 600}
     token = jwt.encode(payload, SECRET, algorithm=ALGORITHM)
+    refresh = create_refresh_token()
 
-    return token
+    return token, refresh
 
 
-def decode_jwt(token: str) -> dict | None:
-    decoded_token = jwt.decode(token, SECRET, algorithms=[ALGORITHM])
-    return decoded_token if decoded_token["expires"] >= time.time() else None
+def decode_jwt(token: str):
+    return jwt.decode(token, SECRET, algorithms=[ALGORITHM])
 
 
 router = APIRouter()
@@ -75,8 +81,12 @@ async def create_user(user: UserBase, session: SessionDep, response: Response):
     session.add(user_in_db)
     session.commit()
     session.refresh(user_in_db)
-    token = sign_jwt(user_in_db.id)
+    token, refresh = sign_jwt(user_in_db.id)
+    user_in_db.refresh_token = refresh
+    session.commit()
+    session.refresh(user_in_db)
     response.set_cookie(key="access_token", value=token)
+    response.set_cookie(key="refresh_token", value=refresh)
     return {"message": "User created successfully"}
 
 
@@ -97,8 +107,12 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
     if bcrypt.checkpw(
         bytes(user.password, "UTF-8"), bytes(existing_user.password, "UTF-8")
     ):
-        token = sign_jwt(existing_user.id)
+        token, refresh = sign_jwt(existing_user.id)
         response.set_cookie(key="access_token", value=token)
+        response.set_cookie(key="refresh_token", value=refresh)
+        existing_user.refresh_token = refresh
+        session.commit()
+        session.refresh(existing_user)
         return {"message": "Logged in successfully"}
     else:
         return JSONResponse(
@@ -108,7 +122,10 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
 
 
 async def get_current_user(
-    session: SessionDep, api_key: str = Depends(access_token_cookie)
+    session: SessionDep,
+    response: Response,
+    api_key: str = Depends(access_token_cookie),
+    refresh_token: str = Depends(refresh_token_cookie),
 ) -> User | JSONResponse:
     access = api_key
     if not access:
@@ -118,21 +135,7 @@ async def get_current_user(
         )
 
     payload = decode_jwt(access)
-    if not payload:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid or expired access token",
-        )
-
     user_id = payload["sub"]
-
-    if payload == {}:
-        raise HTTPException(
-            status_code=401,
-            detail="Invalid or expired access token",
-        )
-
-    # Fetch from DB
     user = session.get(User, user_id)
     if not user:
         raise HTTPException(
@@ -140,4 +143,20 @@ async def get_current_user(
             detail="Failed to login",
         )
 
+    # use refresh token & rotate
+    if payload["expires"] < time.time():
+        if user.refresh_token == refresh_token:
+            token, refresh = sign_jwt(user.id)
+            response.set_cookie(key="access_token", value=token)
+            response.set_cookie(key="refresh_token", value=refresh)
+            user.refresh_token = refresh
+            session.commit()
+            session.refresh(user)
+        else:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid refresh token",
+            )
+
+    # Fetch from DB
     return user

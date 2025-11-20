@@ -113,10 +113,10 @@ INSERT INTO recipe (name, description, instructions, ingredients, calories, prep
 ('Chocolate Lava Cake', 'Warm chocolate cake with molten center', 'Bake until edges are set but center is soft', '{"chocolate": "6 oz", "butter": "6 oz", "eggs": 2, "sugar": "1/4 cup"}', 420, 20, 2, 17, 'chocolate-lava-cake', 3);
 
 -- Insert comments for some recipes
-INSERT INTO "user" (id, username, password, role) VALUES
-(1, 'john_doe', 'hashed_password', 'USER'),
-(2, 'jane_smith', 'hashed_password', 'USER'),
-(3, 'chef_mike', 'hashed_password', 'ADMIN');
+INSERT INTO "user" (id, email, username, password, role) VALUES
+(1, "john@gmail.com", 'john_doe', 'hashed_password', 'USER'),
+(2, "jane@gmail.com", 'jane_smith', 'hashed_password', 'USER'),
+(3, "chef_mike@gmail.com", 'chef_mike', 'hashed_password', 'ADMIN');
 
 INSERT INTO comment (title, text, rating, user_id, recipe_id) VALUES
 ('Delicious!', 'These eggs are the perfect breakfast', 5.0, 1, 1),

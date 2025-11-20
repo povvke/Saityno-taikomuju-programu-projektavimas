@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import select
@@ -33,12 +33,16 @@ router = APIRouter()
     },
 )
 async def create_category(
-    cat: CategoryBase, session: SessionDep, user: User = Depends(get_current_user)
+    cat: CategoryBase,
+    session: SessionDep,
+    response: Response,
+    user: User = Depends(get_current_user),
 ):
     if user.role is not "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
+            headers=response.headers,
         )
 
     try:
@@ -59,6 +63,7 @@ async def create_category(
             return JSONResponse(
                 status_code=409,
                 content={"message": "Category with this slug already exists"},
+                headers=response.headers,
             )
 
 
@@ -97,19 +102,23 @@ async def update_category(
     id: int,
     cat: CategoryUpdate,
     session: SessionDep,
+    res: Response,
     user: User = Depends(get_current_user),
 ):
     if user.role is not "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
+            headers=res.headers,
         )
 
     try:
         cat_db = session.get(Category, id)
         if not cat_db:
             return JSONResponse(
-                status_code=404, content={"message": "Category not found"}
+                status_code=404,
+                content={"message": "Category not found"},
+                headers=res.headers,
             )
 
         cat_data = cat.model_dump(exclude_unset=True)
@@ -128,6 +137,7 @@ async def update_category(
             return JSONResponse(
                 status_code=409,
                 content={"message": "Category with this slug already exists"},
+                headers=res.headers,
             )
 
 
@@ -139,17 +149,22 @@ async def update_category(
     },
 )
 async def delete_category(
-    id: int, session: SessionDep, user: User = Depends(get_current_user)
+    id: int, session: SessionDep, res: Response, user: User = Depends(get_current_user)
 ):
     if user.role is not "ADMIN":
         return JSONResponse(
             status_code=403,
             content={"message": "You do not have access to this resource"},
+            headers=res.headers,
         )
 
     cat = session.get(Category, id)
     if not cat:
-        return JSONResponse(status_code=404, content={"message": "Category not found"})
+        return JSONResponse(
+            status_code=404,
+            content={"message": "Category not found"},
+            headers=res.headers,
+        )
 
     session.delete(cat)
     session.commit()
