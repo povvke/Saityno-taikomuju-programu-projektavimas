@@ -1,6 +1,7 @@
 from pathlib import Path
 from typing import Annotated
 from decimal import Decimal
+import os
 
 from fastapi import Depends
 from pydantic import BaseModel, EmailStr
@@ -83,6 +84,7 @@ class CommentUpdate(BaseModel):
 
 
 class CommentPublic(CommentBase):
+    user_id: int
     id: int
 
 
@@ -115,6 +117,9 @@ engine = create_engine(sqlite_url, connect_args=connect_args)
 
 
 def create_db_and_tables():
+    if os.path.isfile(sqlite_file_name):
+        return
+
     SQLModel.metadata.create_all(engine)
 
     seed_sql = Path("seed.sql").read_text()
