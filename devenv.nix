@@ -7,11 +7,14 @@
 }:
 
 {
+  env.API_URL = "http://127.0.0.1:8000";
+
   packages = with pkgs; [
     git
     sqlite
     typescript-language-server
     svelte-language-server
+    tailwindcss-language-server
     basedpyright
     sqls
     bun
@@ -27,6 +30,8 @@
     python313Packages.pytest-cov
     python313Packages.pytest-asyncio
     python313Packages.pyjwt
+    python313Packages.pylint
+    python313Packages.astroid
   ];
 
   languages.python = {
