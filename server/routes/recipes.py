@@ -2,6 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Query, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
 from .auth import get_current_user
@@ -67,7 +68,7 @@ async def create_recipe(
         session.add(recipe_db)
         session.commit()
         session.refresh(recipe_db)
-        return recipe_db
+        return {**recipe_db.model_dump(), "category_name": recipe_db.category.name}
     except IntegrityError as e:
         session.rollback()
         if "UNIQUE constraint failed" in str(e.orig):
@@ -89,15 +90,25 @@ async def read_recipe(id: int, session: SessionDep):
     recipe = session.get(Recipe, id)
     if not recipe:
         return JSONResponse(status_code=404, content={"message": "Recipe not found"})
-    return recipe
+    return {**recipe.model_dump(), "category_name": recipe.category.name}
 
 
 @router.get("/", response_model=list[RecipePublic])
 async def read_recipes(
     session: SessionDep, offset: int = 0, limit: Annotated[int, Query(le=100)] = 100
 ):
-    recipes = session.exec(select(Recipe).offset(offset).limit(limit)).all()
-    return recipes
+    statement = (
+        select(Recipe)
+        .options(selectinload(Recipe.category))
+        .offset(offset)
+        .limit(limit)
+    )
+    recipes = session.exec(statement).all()
+
+    return [
+        {**recipe.model_dump(), "category_name": recipe.category.name}
+        for recipe in recipes
+    ]
 
 
 @router.patch(
@@ -149,7 +160,7 @@ async def update_recipe(
         session.add(recipe_db)
         session.commit()
         session.refresh(recipe_db)
-        return recipe_db
+        return {**recipe_db.model_dump(), "category_name": recipe_db.category.name}
 
     except IntegrityError as e:
         session.rollback()

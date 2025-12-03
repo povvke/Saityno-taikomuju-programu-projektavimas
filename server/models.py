@@ -5,7 +5,7 @@ import os
 
 from fastapi import Depends
 from pydantic import BaseModel, EmailStr
-from sqlmodel import Field, Session, SQLModel, create_engine
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine
 
 
 class CategoryBase(SQLModel):
@@ -17,6 +17,7 @@ class CategoryBase(SQLModel):
 class Category(CategoryBase, table=True):
     slug: str = Field(unique=True)
     id: int | None = Field(default=None, primary_key=True)
+    recipes: list["Recipe"] = Relationship(back_populates="category")
 
 
 class CategoryPublic(CategoryBase):
@@ -45,6 +46,7 @@ class Recipe(RecipeBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     author_id: int | None = Field(default=None, foreign_key="user.id")
     slug: str = Field(unique=True)
+    category: "Category" = Relationship(back_populates="recipes")
 
 
 class RecipeUpdate(BaseModel):
@@ -59,6 +61,7 @@ class RecipeUpdate(BaseModel):
 
 
 class RecipePublic(RecipeBase):
+    category_name: str
     slug: str
     id: int
 
