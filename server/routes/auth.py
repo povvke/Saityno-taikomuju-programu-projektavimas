@@ -1,8 +1,12 @@
 SECRET = "243a4c253de2af5447ae4abfe707dbb5a4b3080a59bcd8dd8ec459f493dfadad"
 ALGORITHM = "HS256"
 
+import os
+
+cookie_domain = os.environ.get("COOKIE_DOMAIN") or None
+
 import time
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Response
 from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyCookie
 import jwt
@@ -86,10 +90,20 @@ async def create_user(user: UserBase, session: SessionDep, response: Response):
     session.commit()
     session.refresh(user_in_db)
     response.set_cookie(
-        key="access_token", value=token, samesite="lax", secure=False, httponly=True
+        domain=cookie_domain,
+        key="access_token",
+        value=token,
+        samesite="lax",
+        secure=False,
+        httponly=True,
     )
     response.set_cookie(
-        key="refresh_token", value=refresh, samesite="lax", secure=False, httponly=True
+        domain=cookie_domain,
+        key="refresh_token",
+        value=refresh,
+        samesite="lax",
+        secure=False,
+        httponly=True,
     )
     return {"message": "User created successfully"}
 
@@ -113,6 +127,7 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
     ):
         token, refresh = sign_jwt(existing_user.id, existing_user.role)
         response.set_cookie(
+            domain=cookie_domain,
             key="access_token",
             value=token,
             samesite="lax",
@@ -120,6 +135,7 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
             httponly=True,
         )
         response.set_cookie(
+            domain=cookie_domain,
             key="refresh_token",
             value=refresh,
             samesite="lax",
@@ -165,6 +181,7 @@ async def get_current_user(
         if user.refresh_token == refresh_token:
             token, refresh = sign_jwt(user.id, user.role)
             response.set_cookie(
+                domain=cookie_domain,
                 key="access_token",
                 value=token,
                 samesite="lax",
@@ -172,6 +189,7 @@ async def get_current_user(
                 httponly=True,
             )
             response.set_cookie(
+                domain=cookie_domain,
                 key="refresh_token",
                 value=refresh,
                 samesite="lax",
