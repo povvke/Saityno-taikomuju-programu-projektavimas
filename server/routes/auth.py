@@ -85,8 +85,12 @@ async def create_user(user: UserBase, session: SessionDep, response: Response):
     user_in_db.refresh_token = refresh
     session.commit()
     session.refresh(user_in_db)
-    response.set_cookie(key="access_token", value=token)
-    response.set_cookie(key="refresh_token", value=refresh)
+    response.set_cookie(
+        key="access_token", value=token, samesite="lax", secure=False, httponly=True
+    )
+    response.set_cookie(
+        key="refresh_token", value=refresh, samesite="lax", secure=False, httponly=True
+    )
     return {"message": "User created successfully"}
 
 
@@ -108,8 +112,20 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
         bytes(user.password, "UTF-8"), bytes(existing_user.password, "UTF-8")
     ):
         token, refresh = sign_jwt(existing_user.id, existing_user.role)
-        response.set_cookie(key="access_token", value=token)
-        response.set_cookie(key="refresh_token", value=refresh)
+        response.set_cookie(
+            key="access_token",
+            value=token,
+            samesite="lax",
+            secure=False,
+            httponly=True,
+        )
+        response.set_cookie(
+            key="refresh_token",
+            value=refresh,
+            samesite="lax",
+            secure=False,
+            httponly=True,
+        )
         existing_user.refresh_token = refresh
         session.commit()
         session.refresh(existing_user)
@@ -148,8 +164,20 @@ async def get_current_user(
     if payload["expires"] < time.time():
         if user.refresh_token == refresh_token:
             token, refresh = sign_jwt(user.id, user.role)
-            response.set_cookie(key="access_token", value=token)
-            response.set_cookie(key="refresh_token", value=refresh)
+            response.set_cookie(
+                key="access_token",
+                value=token,
+                samesite="lax",
+                secure=False,
+                httponly=True,
+            )
+            response.set_cookie(
+                key="refresh_token",
+                value=refresh,
+                samesite="lax",
+                secure=False,
+                httponly=True,
+            )
             user.refresh_token = refresh
             session.commit()
             session.refresh(user)
@@ -161,3 +189,34 @@ async def get_current_user(
 
     # Fetch from DB
     return user, role
+
+
+@router.post(
+    "/logout",
+    responses={
+        401: {"model": Message, "description": "Authorization Error"},
+    },
+)
+async def login_user(
+    session: SessionDep,
+    response: Response,
+    curr: tuple[User, str] = Depends(get_current_user),
+):
+    existing_user = session.exec(select(User).where(User.id == curr[0].id)).first()
+    if not existing_user:
+        return JSONResponse(
+            status_code=401,
+            content={"message": "WHAT HOW"},
+        )
+
+    existing_user.refresh_token = ""
+    session.commit()
+    session.refresh(existing_user)
+    response.delete_cookie(
+        "access_token", path="/", samesite="lax", secure=False, httponly=True
+    )
+    response.delete_cookie(
+        "refresh_token", path="/", samesite="lax", secure=False, httponly=True
+    )
+
+    return {"message": "Successfully logged out"}

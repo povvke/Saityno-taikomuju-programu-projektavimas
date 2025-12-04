@@ -1,6 +1,6 @@
 <script lang="ts">
-	import Recipe from '$lib/Recipe.svelte';
 	import type { PageProps } from './$types';
+	import Recipe from '$lib/Recipe.svelte';
 	let { data }: PageProps = $props();
 
 	function parseIngredients(ingredientsStr: string) {

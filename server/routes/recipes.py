@@ -68,7 +68,11 @@ async def create_recipe(
         session.add(recipe_db)
         session.commit()
         session.refresh(recipe_db)
-        return {**recipe_db.model_dump(), "category_name": recipe_db.category.name}
+        return {
+            **recipe_db.model_dump(),
+            "category_name": recipe_db.category.name,
+            "author_id": recipe_db.author.id,
+        }
     except IntegrityError as e:
         session.rollback()
         if "UNIQUE constraint failed" in str(e.orig):
@@ -90,7 +94,11 @@ async def read_recipe(id: int, session: SessionDep):
     recipe = session.get(Recipe, id)
     if not recipe:
         return JSONResponse(status_code=404, content={"message": "Recipe not found"})
-    return {**recipe.model_dump(), "category_name": recipe.category.name}
+    return {
+        **recipe.model_dump(),
+        "category_name": recipe.category.name,
+        "author_id": recipe.author.id,
+    }
 
 
 @router.get("/", response_model=list[RecipePublic])
@@ -106,7 +114,11 @@ async def read_recipes(
     recipes = session.exec(statement).all()
 
     return [
-        {**recipe.model_dump(), "category_name": recipe.category.name}
+        {
+            **recipe.model_dump(),
+            "category_name": recipe.category.name,
+            "author_id": recipe.author.id,
+        }
         for recipe in recipes
     ]
 
@@ -160,7 +172,11 @@ async def update_recipe(
         session.add(recipe_db)
         session.commit()
         session.refresh(recipe_db)
-        return {**recipe_db.model_dump(), "category_name": recipe_db.category.name}
+        return {
+            **recipe_db.model_dump(),
+            "category_name": recipe_db.category.name,
+            "author_id": recipe_db.author.id,
+        }
 
     except IntegrityError as e:
         session.rollback()

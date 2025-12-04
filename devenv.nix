@@ -7,7 +7,8 @@
 }:
 
 {
-  env.API_URL = "http://127.0.0.1:8000";
+  env.PUBLIC_API_URL = "http://localhost:3000/api";
+  env.AUTH_KEY = "243a4c253de2af5447ae4abfe707dbb5a4b3080a59bcd8dd8ec459f493dfadad";
 
   packages = with pkgs; [
     git
@@ -51,5 +52,34 @@
       exec = "bun run dev";
       cwd = "./client";
     };
+  };
+
+  services.nginx = {
+    enable = true;
+
+    httpConfig = ''
+      server {
+        listen 3000;
+        server_name localhost;
+
+        # Frontend
+        location / {
+          proxy_pass http://localhost:5173;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+        }
+
+        # Backend API
+        location /api/ {
+          proxy_pass http://localhost:8000/;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        }
+      }
+    '';
   };
 }

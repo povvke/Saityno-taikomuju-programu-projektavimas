@@ -47,6 +47,7 @@ class Recipe(RecipeBase, table=True):
     author_id: int | None = Field(default=None, foreign_key="user.id")
     slug: str = Field(unique=True)
     category: "Category" = Relationship(back_populates="recipes")
+    author: "User" = Relationship(back_populates="recipes")
 
 
 class RecipeUpdate(BaseModel):
@@ -62,6 +63,7 @@ class RecipeUpdate(BaseModel):
 
 class RecipePublic(RecipeBase):
     category_name: str
+    author_id: int
     slug: str
     id: int
 
@@ -106,6 +108,7 @@ class User(UserBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     refresh_token: str | None = Field(default=None)
     role: str
+    recipes: list["Recipe"] = Relationship(back_populates="author")
 
 
 class Message(BaseModel):

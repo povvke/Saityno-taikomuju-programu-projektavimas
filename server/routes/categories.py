@@ -187,4 +187,12 @@ async def read_recipes(
     recipes = session.exec(
         select(Recipe).where(Recipe.category_id == id).offset(offset).limit(limit)
     ).all()
-    return recipes
+
+    return [
+        {
+            **recipe.model_dump(),
+            "category_name": recipe.category.name,
+            "author_id": recipe.author.id,
+        }
+        for recipe in recipes
+    ]
