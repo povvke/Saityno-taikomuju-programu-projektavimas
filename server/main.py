@@ -18,7 +18,11 @@ async def lifespan(app: FastAPI):  # pyright: ignore[reportUnusedParameter]
 app = FastAPI(lifespan=lifespan, redirect_slashes=False)
 
 
-origins = ["*"]
+origins = [
+    "http://localhost:5173",
+    "https://taste-hub.onrender.com",
+    "https://tastehub-1z9h.onrender.com/",
+]
 
 app.add_middleware(
     CORSMiddleware,

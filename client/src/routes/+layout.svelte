@@ -202,7 +202,7 @@
 		<span class="font-semibold text-lg">TasteHub</span>
 
 		<a
-			href="http://localhost:8000/docs"
+			href="{env.PUBLIC_EXTERNAL_API_URL}/docs"
 			target="_blank"
 			rel="noopener noreferrer"
 			class="link link-hover"

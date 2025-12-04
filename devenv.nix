@@ -8,6 +8,7 @@
 
 {
   env.PUBLIC_API_URL = "http://localhost:3000/api";
+  env.PUBLIC_EXTERNAL_API_URL = "http://localhost:8000";
   env.AUTH_KEY = "243a4c253de2af5447ae4abfe707dbb5a4b3080a59bcd8dd8ec459f493dfadad";
 
   packages = with pkgs; [
