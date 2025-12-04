@@ -4,6 +4,10 @@ ALGORITHM = "HS256"
 import os
 
 cookie_domain = os.environ.get("COOKIE_DOMAIN") or None
+is_production = cookie_domain is not None
+cookie_samesite = "none" if is_production else "lax"
+cookie_secure = is_production
+
 
 import time
 from fastapi import APIRouter, Depends, HTTPException, Response
@@ -90,19 +94,17 @@ async def create_user(user: UserBase, session: SessionDep, response: Response):
     session.commit()
     session.refresh(user_in_db)
     response.set_cookie(
-        domain=cookie_domain,
         key="access_token",
         value=token,
-        samesite="lax",
-        secure=False,
+        samesite=cookie_samesite,
+        secure=cookie_secure,
         httponly=True,
     )
     response.set_cookie(
-        domain=cookie_domain,
         key="refresh_token",
         value=refresh,
-        samesite="lax",
-        secure=False,
+        samesite=cookie_samesite,
+        secure=cookie_secure,
         httponly=True,
     )
     return {"message": "User created successfully"}
@@ -127,19 +129,17 @@ async def login_user(user: UserLoginSchema, session: SessionDep, response: Respo
     ):
         token, refresh = sign_jwt(existing_user.id, existing_user.role)
         response.set_cookie(
-            domain=cookie_domain,
             key="access_token",
             value=token,
-            samesite="lax",
-            secure=False,
+            samesite=cookie_samesite,
+            secure=cookie_secure,
             httponly=True,
         )
         response.set_cookie(
-            domain=cookie_domain,
             key="refresh_token",
             value=refresh,
-            samesite="lax",
-            secure=False,
+            samesite=cookie_samesite,
+            secure=cookie_secure,
             httponly=True,
         )
         existing_user.refresh_token = refresh
@@ -181,19 +181,17 @@ async def get_current_user(
         if user.refresh_token == refresh_token:
             token, refresh = sign_jwt(user.id, user.role)
             response.set_cookie(
-                domain=cookie_domain,
                 key="access_token",
                 value=token,
-                samesite="lax",
-                secure=False,
+                samesite=cookie_samesite,
+                secure=cookie_secure,
                 httponly=True,
             )
             response.set_cookie(
-                domain=cookie_domain,
                 key="refresh_token",
                 value=refresh,
-                samesite="lax",
-                secure=False,
+                samesite=cookie_samesite,
+                secure=cookie_secure,
                 httponly=True,
             )
             user.refresh_token = refresh
