@@ -5,6 +5,7 @@ export const load: PageServerLoad = async ({ fetch, params }) => {
 	const res = await fetch(`${env.PUBLIC_API_URL}/categories/${params.id}/recipes`);
 	const recipes = await res.json();
 	return {
-		recipes
+		recipes,
+		category_id: params.id
 	};
 };

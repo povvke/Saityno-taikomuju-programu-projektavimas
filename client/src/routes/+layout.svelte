@@ -196,3 +196,18 @@
 </header>
 
 {@render children?.()}
+
+<footer class="footer items-center p-4 bg-base-200 text-base-content">
+	<div class="container mx-auto flex justify-between">
+		<span class="font-semibold text-lg">TasteHub</span>
+
+		<a
+			href="http://localhost:8000/docs"
+			target="_blank"
+			rel="noopener noreferrer"
+			class="link link-hover"
+		>
+			API docs
+		</a>
+	</div>
+</footer>
