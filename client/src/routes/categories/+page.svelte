@@ -12,6 +12,87 @@
 	let description = $state('');
 	let parent_category = $state(0);
 
+	let showEditCategoryModal = $state(false);
+	let edit_category_id = $state<number | null>(null);
+	let edit_category_name = $state('');
+	let edit_category_description = $state('');
+	let edit_category_parent = $state('');
+
+	// Function to open comment edit modal
+	const openEditCategoryModal = (category: any) => {
+		edit_category_id = category.id;
+		edit_category_name = category.name;
+		edit_category_description = category.description;
+		edit_category_parent = category.parent_category;
+		showEditCategoryModal = true;
+	};
+
+	const handleCategoryDelete = async (event: Event, categoryId: number) => {
+		event.preventDefault();
+		errors = [];
+
+		try {
+			const response = await fetch(`${env.PUBLIC_API_URL}/categories/${categoryId}`, {
+				method: 'DELETE',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include'
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+
+				if (response.status === 422 && data.detail) {
+					// Handle validation errors
+					errors = data.detail.map((err: any) => err.msg);
+				} else if (data.message) {
+					// Handle general error message
+					errors = [data.message];
+				} else {
+					errors = ['An unexpected error occurred'];
+				}
+			} else {
+				data.categories = data.categories.filter((c) => c.id !== categoryId);
+				invalidateAll();
+			}
+		} catch (error) {
+			errors = ['Network error. Please try again.'];
+		}
+	};
+
+	const handleCategoryUpdate = async (event: Event) => {
+		event.preventDefault();
+		errors = [];
+
+		try {
+			const response = await fetch(`${env.PUBLIC_API_URL}/categories/${edit_category_id}`, {
+				method: 'PATCH',
+				headers: { 'Content-Type': 'application/json' },
+				credentials: 'include',
+				body: JSON.stringify({
+					name: edit_category_name,
+					description: edit_category_description,
+					parent_category: edit_category_parent
+				})
+			});
+
+			if (!response.ok) {
+				const data = await response.json();
+				if (response.status === 422 && data.detail) {
+					errors = data.detail.map((err: any) => err.msg);
+				} else if (data.message) {
+					errors = [data.message];
+				} else {
+					errors = ['An unexpected error occurred'];
+				}
+			} else {
+				showEditCategoryModal = false;
+				invalidateAll();
+			}
+		} catch (error) {
+			errors = ['Network error. Please try again.'];
+		}
+	};
+
 	const handleCategoryCreate = async (event: Event) => {
 		event.preventDefault();
 		errors = [];
@@ -64,6 +145,22 @@
 							<a href="/categories/{category.id}/recipes" class="btn btn-primary">View Recipes</a>
 						</div>
 					</div>
+					{#if currentUser.logged_in && currentUser.role === 'ADMIN'}
+						<div class="card-actions justify-end mt-4 pt-4 border-t pr-[1.5rem] pb-[1rem]">
+							<button
+								onclick={() => openEditCategoryModal(category)}
+								class="btn btn-primary btn-sm"
+							>
+								Edit
+							</button>
+							<button
+								onclick={(e) => handleCategoryDelete(e, category.id)}
+								class="btn btn-error btn-sm"
+							>
+								Delete
+							</button>
+						</div>
+					{/if}
 				</div>
 			{/each}
 
@@ -159,6 +256,74 @@
 		</div>
 		<form method="dialog" class="modal-backdrop">
 			<button onclick={() => (showCreateModal = false)}>close</button>
+		</form>
+	</dialog>
+{/if}
+
+{#if showEditCategoryModal}
+	<dialog class="modal modal-open">
+		<div class="modal-box">
+			<h3 class="font-bold text-lg mb-4">Edit Category</h3>
+			<form onsubmit={handleCategoryUpdate}>
+				<div class="form-control mb-3">
+					<label class="label" for="category-title">
+						<span class="label-text">Name</span>
+					</label>
+					<input
+						bind:value={edit_category_name}
+						type="text"
+						id="category-title"
+						placeholder="Give your category a name"
+						class="input input-bordered w-full"
+						required
+					/>
+				</div>
+
+				<div class="form-control mb-3">
+					<label class="label" for="category-parent">
+						<span class="label-text">Parent category id</span>
+					</label>
+					<input
+						bind:value={edit_category_parent}
+						type="number"
+						id="category-parent"
+						placeholder="Enter id of parent category"
+						class="input input-bordered w-full"
+						required
+					/>
+				</div>
+
+				<div class="form-control mb-4">
+					<label class="label" for="category-description">
+						<span class="label-text">Description</span>
+					</label>
+					<textarea
+						id="category-decription"
+						bind:value={edit_category_description}
+						class="textarea textarea-bordered h-24 w-full"
+						placeholder="Enter category description..."
+						required
+					></textarea>
+				</div>
+
+				{#if errors.length > 0}
+					<div class="alert alert-error mb-4">
+						{#each errors as error}
+							<p>{error}</p>
+						{/each}
+					</div>
+				{/if}
+
+				<div class="modal-action">
+					<button type="button" class="btn" onclick={() => (showEditCategoryModal = false)}
+						>Cancel</button
+					>
+					<button type="submit" class="btn btn-primary">Submit</button>
+				</div>
+			</form>
+		</div>
+		<form method="dialog" class="modal-backdrop">
+			<button onclick={() => (showEditCategoryModal = false)}>close</button>
 		</form>
 	</dialog>
 {/if}
