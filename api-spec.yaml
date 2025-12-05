@@ -1,0 +1,1150 @@
+openapi: 3.1.0
+info:
+  title: FastAPI
+  version: 0.1.0
+paths:
+  /categories/:
+    post:
+      tags:
+        - categories
+      summary: Create Category
+      operationId: create_category_categories__post
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryBase'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPublic'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+        - categories
+      summary: Read Categories
+      operationId: read_categories_categories__get
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 100
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CategoryPublic'
+                title: Response Read Categories Categories  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/categories/{id}':
+    get:
+      tags:
+        - categories
+      summary: Read Category
+      operationId: read_category_categories__id__get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPublic'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - categories
+      summary: Update Category
+      operationId: update_category_categories__id__patch
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CategoryUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CategoryPublic'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - categories
+      summary: Delete Category
+      operationId: delete_category_categories__id__delete
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/categories/{id}/recipes':
+    get:
+      tags:
+        - categories
+      summary: Read Recipes
+      operationId: read_recipes_categories__id__recipes_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 100
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePublic'
+                title: Response Read Recipes Categories  Id  Recipes Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /recipes/:
+    post:
+      tags:
+        - recipes
+      summary: Create Recipe
+      operationId: create_recipe_recipes__post
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeBase'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePublic'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+        - recipes
+      summary: Read Recipes
+      operationId: read_recipes_recipes__get
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 100
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePublic'
+                title: Response Read Recipes Recipes  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/recipes/{id}':
+    get:
+      tags:
+        - recipes
+      summary: Read Recipe
+      operationId: read_recipe_recipes__id__get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePublic'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - recipes
+      summary: Update Recipe
+      operationId: update_recipe_recipes__id__patch
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RecipeUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipePublic'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - recipes
+      summary: Delete Recipe
+      operationId: delete_recipe_recipes__id__delete
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/recipes/{id}/comments':
+    get:
+      tags:
+        - recipes
+      summary: Read Comments
+      operationId: read_comments_recipes__id__comments_get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 100
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentPublic'
+                title: Response Read Comments Recipes  Id  Comments Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /comments/:
+    post:
+      tags:
+        - comments
+      summary: Create Comment
+      operationId: create_comment_comments__post
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentBase'
+      responses:
+        '201':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPublic'
+        '400':
+          description: Bad Request Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    get:
+      tags:
+        - comments
+      summary: Read Comments
+      operationId: read_comments_comments__get
+      parameters:
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 0
+            title: Offset
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            maximum: 100
+            default: 100
+            title: Limit
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CommentPublic'
+                title: Response Read Comments Comments  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  '/comments/{id}':
+    get:
+      tags:
+        - comments
+      summary: Read Comment
+      operationId: read_comment_comments__id__get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPublic'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    patch:
+      tags:
+        - comments
+      summary: Update Comment
+      operationId: update_comment_comments__id__patch
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommentPublic'
+        '400':
+          description: Bad Request Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+    delete:
+      tags:
+        - comments
+      summary: Delete Comment
+      operationId: delete_comment_comments__id__delete
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            title: Id
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '403':
+          description: Forbidden Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Not Found Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/register:
+    post:
+      tags:
+        - auth
+      summary: Create User
+      operationId: create_user_auth_register_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserBase'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '400':
+          description: Bad Request Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '409':
+          description: Conflict Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/login:
+    post:
+      tags:
+        - auth
+      summary: Login User
+      operationId: login_user_auth_login_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginSchema'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Authorization Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /auth/logout:
+    post:
+      tags:
+        - auth
+      summary: Login User
+      operationId: login_user_auth_logout_post
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '401':
+          description: Authorization Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+      security:
+        - APIKeyCookie: []
+        - APIKeyCookie: []
+components:
+  schemas:
+    CategoryBase:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        parent_category:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Parent Category
+      type: object
+      required:
+        - name
+        - description
+      title: CategoryBase
+    CategoryPublic:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        parent_category:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Parent Category
+        slug:
+          type: string
+          title: Slug
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+        - name
+        - description
+        - slug
+        - id
+      title: CategoryPublic
+    CategoryUpdate:
+      properties:
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        parent_category:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Parent Category
+      type: object
+      title: CategoryUpdate
+    CommentBase:
+      properties:
+        title:
+          type: string
+          title: Title
+        text:
+          type: string
+          title: Text
+        rating:
+          anyOf:
+            - type: number
+            - type: string
+          title: Rating
+          default: 0
+        recipe_id:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Recipe Id
+      type: object
+      required:
+        - title
+        - text
+      title: CommentBase
+    CommentPublic:
+      properties:
+        title:
+          type: string
+          title: Title
+        text:
+          type: string
+          title: Text
+        rating:
+          type: string
+          title: Rating
+          default: 0
+        recipe_id:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Recipe Id
+        user_id:
+          type: integer
+          title: User Id
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+        - title
+        - text
+        - user_id
+        - id
+      title: CommentPublic
+    CommentUpdate:
+      properties:
+        title:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Title
+        text:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Text
+        rating:
+          anyOf:
+            - type: number
+            - type: string
+            - type: 'null'
+          title: Rating
+      type: object
+      title: CommentUpdate
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Message:
+      properties:
+        message:
+          type: string
+          title: Message
+      type: object
+      required:
+        - message
+      title: Message
+    RecipeBase:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        instructions:
+          type: string
+          title: Instructions
+        ingredients:
+          type: string
+          title: Ingredients
+        calories:
+          type: integer
+          title: Calories
+        prep_time:
+          type: integer
+          title: Prep Time
+        servings:
+          type: integer
+          title: Servings
+        category_id:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Category Id
+      type: object
+      required:
+        - name
+        - description
+        - instructions
+        - ingredients
+        - calories
+        - prep_time
+        - servings
+      title: RecipeBase
+    RecipePublic:
+      properties:
+        name:
+          type: string
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        instructions:
+          type: string
+          title: Instructions
+        ingredients:
+          type: string
+          title: Ingredients
+        calories:
+          type: integer
+          title: Calories
+        prep_time:
+          type: integer
+          title: Prep Time
+        servings:
+          type: integer
+          title: Servings
+        category_id:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Category Id
+        category_name:
+          type: string
+          title: Category Name
+        author_id:
+          type: integer
+          title: Author Id
+        slug:
+          type: string
+          title: Slug
+        id:
+          type: integer
+          title: Id
+      type: object
+      required:
+        - name
+        - description
+        - instructions
+        - ingredients
+        - calories
+        - prep_time
+        - servings
+        - category_name
+        - author_id
+        - slug
+        - id
+      title: RecipePublic
+    RecipeUpdate:
+      properties:
+        name:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Name
+        description:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Description
+        instructions:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Instructions
+        ingredients:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Ingredients
+        calories:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Calories
+        prep_time:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Prep Time
+        servings:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Servings
+        category_id:
+          anyOf:
+            - type: integer
+            - type: 'null'
+          title: Category Id
+      type: object
+      title: RecipeUpdate
+    UserBase:
+      properties:
+        email:
+          anyOf:
+            - type: string
+            - type: 'null'
+          title: Email
+        username:
+          type: string
+          title: Username
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - username
+        - password
+      title: UserBase
+    UserLoginSchema:
+      properties:
+        email:
+          type: string
+          title: Email
+        password:
+          type: string
+          title: Password
+      type: object
+      required:
+        - email
+        - password
+      title: UserLoginSchema
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+              - type: string
+              - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+        - loc
+        - msg
+        - type
+      title: ValidationError
+  securitySchemes:
+    APIKeyCookie:
+      type: apiKey
+      in: cookie
+      name: refresh_token
